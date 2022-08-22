@@ -31,7 +31,9 @@ class ViewController: UIViewController, WKNavigationDelegate {
         
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload)) // ensure the target is the webView
-        toolbarItems = [progressButton, spacer, refresh]
+        let backButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: webView, action: #selector(webView.goBack))
+        let forwardButton = UIBarButtonItem(image: UIImage(systemName: "chevron.forward"), style: .plain, target: webView, action: #selector(webView.goForward))
+        toolbarItems = [backButton, forwardButton, progressButton, spacer, refresh]
         navigationController?.isToolbarHidden = false
         
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
@@ -71,7 +73,6 @@ class ViewController: UIViewController, WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let url = navigationAction.request.url
-        
         if let host = url?.host{
             for website in websites {
                 if host.contains(website){
@@ -80,7 +81,13 @@ class ViewController: UIViewController, WKNavigationDelegate {
                 }
             }
         }
+        let cancelAlertController = UIAlertController(title: "Blocked", message: "This website is Blocked From Viewing", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+        cancelAlertController.addAction(action)
+            present(cancelAlertController, animated: true)
         decisionHandler(.cancel)
+        
+    
     }
 }
 
